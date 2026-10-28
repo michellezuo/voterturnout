@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Who Showed Up? 2022 Turnout</title>
+<meta name="description" content="A friendly, interactive look at who voted in the November 2022 U.S. election, state by state.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+</head>
+<body>
+<div class="sticky">
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mascots" id="brand-mascots" aria-hidden="true"></span>
+      <div>
+        <h1>Who Showed Up?</h1>
+        <p class="sub">Voter turnout in the November 2022 election, state by state ♡ every number is calculated from the real data</p>
+      </div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button data-tab="overview" class="active">Hello!</button>
+      <button data-tab="discover">Discoveries</button>
+      <button data-tab="explore">Explore</button>
+      <button data-tab="investigate">Dig deeper</button>
+      <button data-tab="ask">Ask Ballo</button>
+    </nav>
+  </header>
+  <section class="globalbar" id="globalbar" aria-label="Analysis settings"></section>
+</div>
+
+<main>
+  <section id="tab-overview" class="tab active"></section>
+
+  <section id="tab-discover" class="tab">
+    <div class="intro bubble-row">
+      <span class="mascot-slot" data-mascot="ballo:happy:84"></span>
+      <div class="speech"><h2>What we found</h2>
+        <p>Eight discoveries, sorted from <b>most solid</b> to <b>least certain</b>. Each one says how much to trust it. Tap a card to dig deeper!</p></div>
+    </div>
+    <div id="feed" class="feed"></div>
+  </section>
+
+  <section id="tab-explore" class="tab">
+    <div class="intro bubble-row">
+      <span class="mascot-slot" data-mascot="bloo:happy:76"></span>
+      <div class="speech"><h2>Play with the data</h2>
+        <p>Everything here is connected: <b>click a state</b> anywhere and it lights up in every chart. Drag a loop on the dot chart to pick a bunch of states at once.</p></div>
+    </div>
+    <div class="grid g-2-1">
+      <div class="card">
+        <div class="card-head"><h3>🗺️ The map</h3>
+          <label>Color by <select id="map-var"></select></label></div>
+        <div id="map" class="plot h-380"></div>
+        <p class="hint">Darker blue = higher number. Click a state to learn about it.</p>
+      </div>
+      <div class="card" id="profile"></div>
+    </div>
+
+    <div class="grid g-2-1">
+      <div class="card">
+        <div class="card-head"><h3>🔍 Do two things go together?</h3>
+          <div class="controls">
+            <label>Across <select id="sc-x"></select></label>
+            <label>Up <select id="sc-y"></select></label>
+            <label>Color <select id="sc-color"><option value="region">Region</option><option value="felony_regime">Felony voting rules</option><option value="alt_numerator">Counting method</option><option value="status_group">Result status</option></select></label>
+            <label class="chk"><input type="checkbox" id="sc-ols" checked> Trend line</label>
+            <label class="chk"><input type="checkbox" id="sc-lowess"> Wiggly trend</label>
+          </div></div>
+        <div id="scatter" class="plot h-460"></div>
+        <p class="hint">Each dot is a state. If dots drift downhill from left to right, the two things tend to move in opposite directions. The shaded band shows where the trend line could plausibly be.</p>
+      </div>
+      <div class="card" id="sc-stats"></div>
+    </div>
+
+    <div class="grid g-1-1">
+      <div class="card">
+        <div class="card-head"><h3>📊 How spread out?</h3><label>Variable <select id="hist-var"></select></label></div>
+        <div id="hist" class="plot h-320"></div>
+        <p class="hint">Taller bars = more states in that range. Dots underneath are individual states.</p>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>🧺 Compare groups</h3><label>Group by <select id="grp-var"></select></label></div>
+        <div id="grp" class="plot h-320"></div>
+        <div id="grp-stats" class="small"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>🏆 Ranking</h3><label>Rank by <select id="rank-var"></select></label></div>
+      <div id="rank" class="plot h-340"></div>
+    </div>
+
+    <div class="grid g-1-1">
+      <div class="card">
+        <div class="card-head"><h3>🧶 What goes with what?</h3>
+          <label>Method <select id="heat-method"><option value="spearman">Rank-based (sturdier)</option><option value="pearson">Straight-line</option></select></label></div>
+        <div id="heat" class="plot h-520"></div>
+        <p class="hint"><span class="sw sw-red"></span> red = rise together · <span class="sw sw-blue"></span> blue = one rises while the other falls · pale = no link. <b>Bold</b> numbers pass the “probably not luck” test. Click a square to plot that pair.</p>
+      </div>
+      <div class="card" id="selection-panel"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h3>📋 All the numbers</h3><span class="muted small">Click a row to select · tick “hide” to leave a state out of everything</span></div>
+      <div id="table" class="table-wrap"></div>
+    </div>
+  </section>
+
+  <section id="tab-investigate" class="tab">
+    <div class="inv-layout">
+      <aside id="inv-list" class="inv-list"></aside>
+      <div id="inv-main" class="inv-main"></div>
+    </div>
+  </section>
+
+  <section id="tab-ask" class="tab">
+    <div class="intro bubble-row">
+      <span class="mascot-slot" data-mascot="ballo:happy:92"></span>
+      <div class="speech"><h2>Ask Ballo</h2>
+        <p>Ask a question in your own words. Ballo answers by <b>actually running the numbers</b> on the data, never by guessing. Try naming a state (“Tell me about Ohio”) or a topic (“prison”, “non-citizens”, “region”).</p></div>
+    </div>
+    <div class="card ask-box">
+      <div class="chips" id="ask-chips"></div>
+      <form id="ask-form" class="ask-form">
+        <input id="ask-input" placeholder="Type a question… e.g. Tell me about Michigan" autocomplete="off">
+        <label class="chk" id="ai-toggle-wrap"><input type="checkbox" id="ai-toggle"> AI explainer</label>
+        <button type="submit" class="btn primary">Ask ✦</button>
+      </form>
+      <p class="hint" id="ai-status"></p>
+    </div>
+    <div id="ask-log"></div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span class="mascot-slot" data-mascot="rosie:happy:40"></span>
+  <span>Data: 2022 November General Election turnout rates (50 states + DC). Patterns across states are not proof of cause and effect.</span>
+</footer>
+
+<div id="busy" class="busy" hidden><span class="mascot-slot bounce" data-mascot="ballo:thinking:72"></span><p id="busy-msg">Crunching numbers…</p></div>
+<div id="toast" class="toast" role="status"></div>
+<script src="app.js"></script>
+</body>
+</html>
