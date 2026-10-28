@@ -1,3 +1,5 @@
+# Link: https://michellezuo.github.io/voterturnout/
+
 # Who Showed Up? · 2022 voter turnout explorer
 
 A friendly, interactive website about one dataset: **`2022 November General Election - Turnout Rates.csv`** (stored as `data/turnout_2022.csv`). It covers how many people voted in each U.S. state (plus DC) in November 2022, and what might explain the differences.
